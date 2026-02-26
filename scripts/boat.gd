@@ -42,60 +42,53 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	# ── Steering (rudder) ─────────────────────────────────────────
 	var steer := 0.0
-	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+	if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT):
 		steer -= 1.0
-	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+	if Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT):
 		steer += 1.0
 	rotation += steer * turn_speed * delta
 
 	# ── Sail trim (Q / E) ────────────────────────────────────────
 	var trim := 0.0
-	if Input.is_key_pressed(KEY_Q):
+	if Input.is_physical_key_pressed(KEY_Q):
 		trim -= 1.0
-	if Input.is_key_pressed(KEY_E):
+	if Input.is_physical_key_pressed(KEY_E):
 		trim += 1.0
-	sail_angle = clampf(sail_angle + trim * sail_trim_speed * delta,
-						- max_sail_angle, max_sail_angle)
+	sail_angle = clampf(sail_angle + trim * sail_trim_speed * delta, -max_sail_angle, max_sail_angle)
 
-	# ── Wind force on sail ────────────────────────────────────────
+	# ── Wind force (realistic sail model) ──────────────────────────
 	var wind_dir: Vector2 = Wind.wind_direction
 	var wind_str: float = Wind.wind_strength
 
-	# Apparent wind = true wind − boat velocity (simplified).
+	var forward_dir := Vector2.RIGHT.rotated(rotation)
+	var sail_dir := forward_dir.rotated(sail_angle)
+
+	# Calculate apparent wind (wind relative to boat motion)
 	var apparent_wind := wind_dir * wind_str - velocity
-	var apparent_strength := apparent_wind.length()
+	var apparent_wind_mag := apparent_wind.length()
+	var apparent_wind_dir := apparent_wind.normalized()
 
-	if apparent_strength > 0.1:
-		var apparent_dir := apparent_wind.normalized()
+	# Sail force is proportional to the component of apparent wind perpendicular to the sail
+	var wind_to_sail_angle := sail_dir.angle_to(apparent_wind_dir)
+	var sail_force_mag: float = sail_efficiency * apparent_wind_mag * abs(sin(wind_to_sail_angle))
 
-		# Sail normal (perpendicular to the sail chord) in world space.
-		var sail_world_angle := rotation + sail_angle
-		var sail_normal := Vector2.UP.rotated(sail_world_angle)
+	# Sail force direction is perpendicular to the sail (lift), pushing the boat forward
+	var sail_lift_dir := sail_dir.rotated(sign(wind_to_sail_angle) * PI / 2)
+	var sail_force := sail_lift_dir * sail_force_mag
 
-		# Force magnitude ∝ |dot(apparent_wind_dir, sail_normal)|.
-		# This naturally gives zero force when the wind is along the sail
-		# and max force when perpendicular to it.
-		var force_mag := absf(apparent_dir.dot(sail_normal)) * apparent_strength * sail_efficiency
-
-		# Force direction: push along the apparent wind direction projected
-		# onto the sail normal side (away from wind).
-		var push_dir := sail_normal if apparent_dir.dot(sail_normal) > 0.0 else -sail_normal
-		var sail_force := push_dir * force_mag
-
-		velocity += sail_force * delta
+	velocity += sail_force * delta
 
 	# ── Auxiliary thrust (W / S — small, for docking) ─────────────
 	var throttle := 0.0
-	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
+	if Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP):
 		throttle += 1.0
-	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
+	if Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN):
 		throttle -= 0.4
 	if throttle != 0.0:
 		var forward := Vector2.RIGHT.rotated(rotation)
 		velocity += forward * throttle * aux_thrust * delta
 
 	# ── Keel: resist lateral (sideways) motion ───────────────────
-	var forward_dir := Vector2.RIGHT.rotated(rotation)
 	var lateral_dir := Vector2.DOWN.rotated(rotation)
 
 	var forward_component := velocity.dot(forward_dir)

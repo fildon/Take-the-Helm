@@ -1,23 +1,23 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://ide0s3ikw8xl"]
 
-[ext_resource type="Script" path="res://scripts/wind_hud.gd" id="1_hud"]
+[ext_resource type="Script" uid="uid://dotycqd3fie2t" path="res://scripts/wind_hud.gd" id="1_hud"]
 
-[node name="WindHUD" type="Control"]
+[node name="WindHUD" type="Control" unique_id=536019533]
 layout_mode = 3
 anchors_preset = 15
-anchor_left = 0.0
-anchor_top = 0.0
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_hud")
 
-[node name="WindArrow" type="Polygon2D" parent="."]
+[node name="WindArrow" type="Polygon2D" parent="." unique_id=311589220]
 position = Vector2(60, 60)
 color = Color(1, 1, 1, 0.8)
 polygon = PackedVector2Array(0, -20, -8, 14, 0, 8, 8, 14)
 
-[node name="WindLabel" type="Label" parent="."]
+[node name="WindLabel" type="Label" parent="." unique_id=219007132]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 88.0
@@ -26,7 +26,7 @@ offset_bottom = 108.0
 text = "Wind"
 horizontal_alignment = 1
 
-[node name="SpeedLabel" type="Label" parent="."]
+[node name="SpeedLabel" type="Label" parent="." unique_id=1085072836]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 110.0
@@ -34,15 +34,8 @@ offset_right = 160.0
 offset_bottom = 130.0
 text = "Speed: 0"
 
-[node name="SailLabel" type="Label" parent="."]
-layout_mode = 0
-offset_left = 16.0
-offset_top = 132.0
-offset_right = 160.0
-offset_bottom = 152.0
-text = "Sail: +0°"
-
-[node name="ControlsHint" type="Label" parent="."]
+[node name="ControlsHint" type="Label" parent="." unique_id=1073536048]
+modulate = Color(1, 1, 1, 0.6)
 layout_mode = 0
 offset_left = 16.0
 offset_top = 164.0
@@ -51,4 +44,3 @@ offset_bottom = 220.0
 text = "A/D - Steer
 Q/E - Trim Sail
 W/S - Oar (slow)"
-modulate = Color(1, 1, 1, 0.6)
