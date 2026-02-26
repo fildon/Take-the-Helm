@@ -18,7 +18,7 @@ polygon = PackedVector2Array(-12, -7, 0, -8, 14, -3, 17, 0, 14, 3, 0, 8, -12, 7,
 
 [node name="Sail" type="Polygon2D" parent="."]
 color = Color(0.92, 0.9, 0.84, 1)
-polygon = PackedVector2Array(-2, -16, 10, -2, -2, 2)
+polygon = PackedVector2Array(0, -18, 12, 0, 0, 4)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectShape_1")
