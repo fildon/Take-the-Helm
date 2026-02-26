@@ -3,20 +3,23 @@ extends Control
 
 @onready var _wind_arrow: Polygon2D = $WindArrow
 @onready var _speed_label: Label = $SpeedLabel
-@onready var _sail_label: Label  = $SailLabel
+@onready var _sail_label: Label = $SailLabel
 
 var _boat: CharacterBody2D
 
 
 func _ready() -> void:
-	# Find the boat in the scene tree (sibling or child of parent).
+	_find_boat()
+
+
+func _find_boat() -> void:
 	_boat = get_tree().get_first_node_in_group("boat") as CharacterBody2D
-	if not _boat:
-		# Fall back to path from main scene.
-		_boat = get_node_or_null("../Boat") as CharacterBody2D
 
 
 func _process(_delta: float) -> void:
+	if not _boat:
+		_find_boat()
+
 	# ── Wind arrow ────────────────────────────────────────────────
 	if _wind_arrow:
 		# Show the direction the wind is blowing *from* (more intuitive).

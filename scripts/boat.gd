@@ -35,6 +35,10 @@ var sail_angle: float = 0.0
 @onready var _sail_polygon: Polygon2D = $Sail
 
 
+func _ready() -> void:
+	add_to_group("boat")
+
+
 func _physics_process(delta: float) -> void:
 	# ── Steering (rudder) ─────────────────────────────────────────
 	var steer := 0.0
@@ -51,11 +55,11 @@ func _physics_process(delta: float) -> void:
 	if Input.is_key_pressed(KEY_E):
 		trim += 1.0
 	sail_angle = clampf(sail_angle + trim * sail_trim_speed * delta,
-						-max_sail_angle, max_sail_angle)
+						- max_sail_angle, max_sail_angle)
 
 	# ── Wind force on sail ────────────────────────────────────────
 	var wind_dir: Vector2 = Wind.wind_direction
-	var wind_str: float   = Wind.wind_strength
+	var wind_str: float = Wind.wind_strength
 
 	# Apparent wind = true wind − boat velocity (simplified).
 	var apparent_wind := wind_dir * wind_str - velocity
